@@ -1,9 +1,7 @@
 import com.mysql.cj.protocol.Resultset;
 
-import javax.swing.plaf.nimbus.State;
-import javax.xml.transform.Result;
-import java.awt.image.AbstractMultiResolutionImage;
 import java.sql.*;
+import java.time.LocalDate;
 
 public class DB_MANAGER_CLINICADB {
     private static Connection connection = null;
@@ -41,6 +39,7 @@ public class DB_MANAGER_CLINICADB {
     private static final String DBT_VISITAS_C_PROXIMA_VISITA = "PROXIMA_VISITA";
     private static final String DBT_VISITAS_SELECT_ALL_QUERY = "SELECT * FROM " + DBT_VISITAS;
 
+    //METODO PARA CARGAR EL DRIVER MYSQL-JDBC
     public static boolean loadDriver(){
         try {
             System.out.println("Cargando Driver DBJC...");
@@ -61,8 +60,8 @@ public class DB_MANAGER_CLINICADB {
             return false;
         }
     }
-
-    public static boolean connect(){
+    //METODO PARA CREAR LA CONEXION CON LA BASE DE DATOS
+    public static boolean openConnectionToDatabase(){
         try {
             System.out.println("Connecting to the database...");
             connection = DriverManager.getConnection(URL, USUARIODB, PASSWORD);
@@ -74,7 +73,7 @@ public class DB_MANAGER_CLINICADB {
             return false;
         }
     }
-
+    //METODO PARA CERRAR LA CONEXION CON LA BASE DE DATOS
     public static void closeConnectioToDatabase(){
         try {
             System.out.println("Closing your connection to the database " + DBNAME);
@@ -85,34 +84,32 @@ public class DB_MANAGER_CLINICADB {
             System.out.println(e.getMessage());
         }
     }
-
+    //METODO PARA EJECUTAR LA QUERY SELECT * FROM PACIENTES Y DEVOLVER EL RESULTADO.
     public static ResultSet selectAllFromPacientes(){
         return selectAllFromPacientes(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
     }
-
+    //MISMO METODO PERO CON EL CONTENIDO
     public static ResultSet selectAllFromPacientes(int resultSetType, int resultSetConcurrency)
     {
         try{
             Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
-            ResultSet resultSet = statement.executeQuery(BDT_PACIENTES_SELECT_ALL_QUERY);
-            return resultSet;
+            return statement.executeQuery(BDT_PACIENTES_SELECT_ALL_QUERY);
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
             return null;
         }
     }
-
+    //METODO PARA EJECUTAR LA QUERY SELECT * FROM VISITAS Y DEVOLVER EL RESULTADO.
     public static ResultSet selectAllFromVisitas(){
         return selectAllFromVisitas(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
     }
-
+    //MISMO METODO PERO CON EL CONTENIDO
     public static ResultSet selectAllFromVisitas(int resultSetType, int resultSetConcurrency)
     {
         try{
             Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
-            ResultSet resultSet = statement.executeQuery(DBT_VISITAS_SELECT_ALL_QUERY);
-            return resultSet;
+            return statement.executeQuery(DBT_VISITAS_SELECT_ALL_QUERY);
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
@@ -120,5 +117,51 @@ public class DB_MANAGER_CLINICADB {
         }
     }
 
-    
+    //METODO PARA DEVOLVER POR CONSOLA LOS DATOS DE LA BASE DE DATOS
+    public static void printTablaPacientes(){
+        try{
+            ResultSet resultSet = selectAllFromPacientes(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            if(resultSet != null){
+                while (resultSet.next()){
+                    int codigoPaciente = resultSet.getInt(DBT_PACIENTES_C_CODIGO);
+                    String nombrePaciente = resultSet.getString(DBT_PACIENTES_C_NOMBRE);
+                    String direccionPaciente = resultSet.getString(DBT_PACIENTES_C_DIRECCION);
+                    String ciudadPaciente = resultSet.getString(DBT_PACIENTES_C_CIUDAD);
+                    String telefonoPaciente = resultSet.getString(DBT_PACIENTES_C_TELEFONO);
+                    int esDiabeticoPaciente = resultSet.getInt(DBT_PACIENTES_C_DIABETICO); //IF PACIENTE DIABETICO -> 1 ELSE -> 0
+                    LocalDate fechaNacimientoPaciente = resultSet.getDate(DBT_PACIENTES_C_FECHA_NACIMIENTO).toLocalDate();
+                    int turnoPaciente = resultSet.getInt(DBT_PACIENTES_C_TURNO);
+                    System.out.println(codigoPaciente + "\t" + nombrePaciente + "\t" + direccionPaciente + "\t" + ciudadPaciente + "\t" + telefonoPaciente + "\t" + esDiabeticoPaciente + "\t" + fechaNacimientoPaciente + "\t" + turnoPaciente);
+                }
+                resultSet.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+    }
+
+    //METODO PARA DEVOLVER POR CONSOLA LOS DATOS DE LA BASE DE DATOS
+    public static void printTablaVisitas(){
+        try{
+            ResultSet resultSet = selectAllFromVisitas(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            if(resultSet != null){
+                while (resultSet.next()){
+                    int codigoVisita = resultSet.getInt(DBT_VISITAS_C_CODIGO);
+                    int idPaciente = resultSet.getInt(DBT_VISITAS_C_ID_PACIENTE);
+                    LocalDate fechaVisitaPaciente = resultSet.getDate(DBT_VISITAS_C_FECHA_VISITA).toLocalDate();
+                    String enfermedaVisita = resultSet.getString(DBT_VISITAS_C_ENFERMEDAD);
+                    Double importeVisita = resultSet.getDouble(DBT_VISITAS_C_IMPORTE);
+                    Double porcentajePagoVisita = resultSet.getDouble(DBT_VISITAS_C_PORCENTAJE_PAGO);
+                    LocalDate proximaVisita = resultSet.getDate(DBT_VISITAS_C_PROXIMA_VISITA).toLocalDate();
+                    System.out.println(codigoVisita + "\t" + idPaciente + "\t" + fechaVisitaPaciente + "\t" + enfermedaVisita + "\t" + importeVisita + "\t" + porcentajePagoVisita + "\t" + proximaVisita);
+                }
+                resultSet.close();
+                System.out.println("ALL APPOINTMENTS SUCCESSFULLY CHARGED!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+    }
 }
