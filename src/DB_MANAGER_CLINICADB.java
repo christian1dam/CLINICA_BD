@@ -17,16 +17,22 @@ public class DB_MANAGER_CLINICADB {
     //CONSTANTES PARA CHECK SI SE AH PODIDO CONECTAR CON LA BASE DE DATOS
     private static final String DB_MYSQL_CONNECTION_OK = "SUCCESSFULLY CONNECTED TO " + DBNAME + " DATABASE";
     private static final String DB_MYSQL_CONNECTION_NOT_OK = "ERROR! COULD NOT BEEN CONNECTED TO" + DBNAME + " DATABASE";
+    //CONSTANTES APRA LA TABLA USUARIOS
+    private static final String DBT_USUARIOS = "usuarios";
+    private static final String DBT_USUARIOS_C_NOMBRE = "NOMBRE";
+    private static final String DBT_USUARIOS_C_CONTRASENYA = "CONTRASENYA";
+    private static final String BDT_USUARIOS_SELECT_ALL_QUERY = "SELECT * FROM " + DBT_USUARIOS;
     //CONSTANTES PARA LA TABLA PACIENTES
     private static final String DBT_PACIENTES = "pacientes";
     private static final String DBT_PACIENTES_C_CODIGO = "CODIGO";
-    private static final String DBT_PACIENTES_C_CIUDAD = "CIUDAD";
-    private static final String DBT_PACIENTES_C_DIABETICO = "DIABETICO";
-    private static final String DBT_PACIENTES_C_DIRECCION = "DIRECCION";
-    private static final String DBT_PACIENTES_C_FECHA_NACIMIENTO = "FECHA_NACIMIENTO";
     private static final String DBT_PACIENTES_C_NOMBRE = "NOMBRE";
+    private static final String DBT_PACIENTES_C_DIRECCION = "DIRECCION";
+    private static final String DBT_PACIENTES_C_CIUDAD = "CIUDAD";
     private static final String DBT_PACIENTES_C_TELEFONO = "TELEFONO";
+    private static final String DBT_PACIENTES_C_DIABETICO = "DIABETICO";
+    private static final String DBT_PACIENTES_C_FECHA_NACIMIENTO = "FECHA_NACIMIENTO";
     private static final String DBT_PACIENTES_C_TURNO = "TURNO";
+    private static final String DBT_PACIENTES_C_ID_USUARIO = "ID_USUARIO";
     private static final String BDT_PACIENTES_SELECT_ALL_QUERY = "SELECT * FROM " + DBT_PACIENTES;
     //CONSTANTES PARA LA TABLA VISITAS
     private static final String DBT_VISITAS = "visitas";
@@ -84,6 +90,23 @@ public class DB_MANAGER_CLINICADB {
             System.out.println(e.getMessage());
         }
     }
+
+    //METODO PARA EJECUTAR LA QUERY SELECT * FROM USUARIOS Y DEVOLVER EL RESULTADO
+    public static ResultSet selectAllFromUsuarios(){
+        return selectAllFromUsuarios(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+    }
+
+    public static ResultSet selectAllFromUsuarios(int resultSetType, int resultSetConcurrency){
+        try{
+            Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
+            return statement.executeQuery(BDT_USUARIOS_SELECT_ALL_QUERY);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
     //METODO PARA EJECUTAR LA QUERY SELECT * FROM PACIENTES Y DEVOLVER EL RESULTADO.
     public static ResultSet selectAllFromPacientes(){
         return selectAllFromPacientes(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
