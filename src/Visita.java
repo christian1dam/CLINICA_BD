@@ -9,7 +9,8 @@ public class Visita {
     private Double porcentajePago;
     private LocalDate proximaVisita;
     //TODO -> IMPLEMENTAR VALIDACIONES
-    public Visita(int idPaciente, LocalDate fechaVisita, String enfermedad, Double importe, Double porcentajePago, LocalDate proximaVisita) {
+    public Visita(int codigo, int idPaciente, LocalDate fechaVisita, String enfermedad, Double importe, Double porcentajePago, LocalDate proximaVisita) {
+        setCodigo(codigo);
         setIdPaciente(idPaciente);
         setFechaVisita(fechaVisita);
         setEnfermedad(enfermedad);
@@ -20,6 +21,10 @@ public class Visita {
 
     public int getCodigo() {
         return this.codigo;
+    }
+
+    public void setCodigo(int codigo){
+        this.codigo = codigo;
     }
 
     public int getIdPaciente() {

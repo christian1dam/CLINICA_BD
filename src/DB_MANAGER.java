@@ -1,24 +1,27 @@
-import com.mysql.cj.protocol.Resultset;
-
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.time.LocalDate;
 
-public class DB_MANAGER_CLINICADB {
+public class DB_MANAGER {
     private static Connection connection = null;
     //CONSTATNTES PARA LA CONEXION
-    private static final String DBHOST =  "localhost";
-    private static final String PORT = "3306";
-    private static final String DBNAME = "clinica_db";
-    private static final String SERVERTIMEZONE = "serverTimezone=UTC";
-    private static final String URL ="jdbc:mysql://" + DBHOST + ":" + PORT + "/" + DBNAME + "?" + SERVERTIMEZONE;
-    //CONSTANTES APRA EL USUARIO
-    private static final String USUARIODB = "root";
-    private static final String PASSWORD = ""; //NO HAY CONTRASEÑA EN ESTE CASO
+    private static final String DBHOST =  "192.168.56.1";
+    private static final String PORT = "1433";
+    private static final String DBNAME = "CLINICA_DB";
+    //CONSTANTES PARA EL USUARIO
+    private static final String DBUSER = "Alberto";
+    private static final String PASSWORD = "1234";
+    //CONSTANTES SEGURIDAD
+    private static final String ENCRYPT = "true";
+    private static final String TRUST_SERVER_CERTIFICATE = "true";
+    //URL FINAL
+    private static final String URL ="jdbc:sqlserver://" + DBHOST + ":" + PORT + ";databaseName=" + DBNAME + ";user=" + DBUSER + ";password=" + PASSWORD + ";encrypt=" + ENCRYPT + ";trustServerCertificate=" + TRUST_SERVER_CERTIFICATE;
     //CONSTANTES PARA CHECK SI SE AH PODIDO CONECTAR CON LA BASE DE DATOS
     private static final String DB_MYSQL_CONNECTION_OK = "SUCCESSFULLY CONNECTED TO " + DBNAME + " DATABASE";
     private static final String DB_MYSQL_CONNECTION_NOT_OK = "ERROR! COULD NOT BEEN CONNECTED TO" + DBNAME + " DATABASE";
     //CONSTANTES APRA LA TABLA USUARIOS
-    private static final String DBT_USUARIOS = "usuarios";
+    private static final String DBT_USUARIOS = "USUARIOS";
+    private static final String DBT_USUARIOS_C_CODIGO = "CODIGO";
     private static final String DBT_USUARIOS_C_NOMBRE = "NOMBRE";
     private static final String DBT_USUARIOS_C_CONTRASENYA = "CONTRASENYA";
     private static final String BDT_USUARIOS_SELECT_ALL_QUERY = "SELECT * FROM " + DBT_USUARIOS;
@@ -45,11 +48,11 @@ public class DB_MANAGER_CLINICADB {
     private static final String DBT_VISITAS_C_PROXIMA_VISITA = "PROXIMA_VISITA";
     private static final String DBT_VISITAS_SELECT_ALL_QUERY = "SELECT * FROM " + DBT_VISITAS;
 
-    //METODO PARA CARGAR EL DRIVER MYSQL-JDBC
+    //METODO PARA CARGAR EL DRIVER SQLSEREVER
     public static boolean loadDriver(){
         try {
             System.out.println("Cargando Driver DBJC...");
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
             System.out.println("DRIVER JDBC SUCCESSFULLY LOADED!");
             return true;
         } catch (ClassNotFoundException e) {
@@ -66,11 +69,12 @@ public class DB_MANAGER_CLINICADB {
             return false;
         }
     }
+
     //METODO PARA CREAR LA CONEXION CON LA BASE DE DATOS
     public static boolean openConnectionToDatabase(){
         try {
             System.out.println("Connecting to the database...");
-            connection = DriverManager.getConnection(URL, USUARIODB, PASSWORD);
+            connection = DriverManager.getConnection(URL);
             System.out.println("Successfully connect to the database " + DBNAME + " !");
             return true;
         } catch (SQLException e) {
@@ -79,6 +83,7 @@ public class DB_MANAGER_CLINICADB {
             return false;
         }
     }
+
     //METODO PARA CERRAR LA CONEXION CON LA BASE DE DATOS
     public static void closeConnectioToDatabase(){
         try {
@@ -111,9 +116,8 @@ public class DB_MANAGER_CLINICADB {
     public static ResultSet selectAllFromPacientes(){
         return selectAllFromPacientes(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
     }
-    //MISMO METODO PERO CON EL CONTENIDO
-    public static ResultSet selectAllFromPacientes(int resultSetType, int resultSetConcurrency)
-    {
+
+    public static ResultSet selectAllFromPacientes(int resultSetType, int resultSetConcurrency){
         try{
             Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
             return statement.executeQuery(BDT_PACIENTES_SELECT_ALL_QUERY);
@@ -123,13 +127,14 @@ public class DB_MANAGER_CLINICADB {
             return null;
         }
     }
+
     //METODO PARA EJECUTAR LA QUERY SELECT * FROM VISITAS Y DEVOLVER EL RESULTADO.
     public static ResultSet selectAllFromVisitas(){
         return selectAllFromVisitas(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
     }
+
     //MISMO METODO PERO CON EL CONTENIDO
-    public static ResultSet selectAllFromVisitas(int resultSetType, int resultSetConcurrency)
-    {
+    public static ResultSet selectAllFromVisitas(int resultSetType, int resultSetConcurrency){
         try{
             Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
             return statement.executeQuery(DBT_VISITAS_SELECT_ALL_QUERY);
@@ -140,7 +145,7 @@ public class DB_MANAGER_CLINICADB {
         }
     }
 
-    //METODO PARA DEVOLVER POR CONSOLA LOS DATOS DE LA BASE DE DATOS
+    //METODO PARA DEVOLVER POR CONSOLA LOS DATOS DE LA TABLA PACIENTES
     public static void printTablaPacientes(){
         try{
             ResultSet resultSet = selectAllFromPacientes(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -154,17 +159,19 @@ public class DB_MANAGER_CLINICADB {
                     int esDiabeticoPaciente = resultSet.getInt(DBT_PACIENTES_C_DIABETICO); //IF PACIENTE DIABETICO -> 1 ELSE -> 0
                     LocalDate fechaNacimientoPaciente = resultSet.getDate(DBT_PACIENTES_C_FECHA_NACIMIENTO).toLocalDate();
                     int turnoPaciente = resultSet.getInt(DBT_PACIENTES_C_TURNO);
-                    System.out.println(codigoPaciente + "\t" + nombrePaciente + "\t" + direccionPaciente + "\t" + ciudadPaciente + "\t" + telefonoPaciente + "\t" + esDiabeticoPaciente + "\t" + fechaNacimientoPaciente + "\t" + turnoPaciente);
+                    int id_usuario = resultSet.getInt(DBT_PACIENTES_C_ID_USUARIO);
+                    System.out.println("CODIGO PACIENTE: " + codigoPaciente + "\t" + nombrePaciente + "\t" + direccionPaciente + "\t" + ciudadPaciente + "\t" + telefonoPaciente + "\t" + esDiabeticoPaciente + "\t" + fechaNacimientoPaciente + "\t" + turnoPaciente + "\t" + id_usuario);
                 }
                 resultSet.close();
             }
+            System.out.println("ALL PATIENTS SUCCESSFULLY CHARGED!");
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
     }
 
-    //METODO PARA DEVOLVER POR CONSOLA LOS DATOS DE LA BASE DE DATOS
+    //METODO PARA DEVOLVER POR CONSOLA LOS DATOS DE LA TABLA VISITAS
     public static void printTablaVisitas(){
         try{
             ResultSet resultSet = selectAllFromVisitas(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -177,14 +184,35 @@ public class DB_MANAGER_CLINICADB {
                     Double importeVisita = resultSet.getDouble(DBT_VISITAS_C_IMPORTE);
                     Double porcentajePagoVisita = resultSet.getDouble(DBT_VISITAS_C_PORCENTAJE_PAGO);
                     LocalDate proximaVisita = resultSet.getDate(DBT_VISITAS_C_PROXIMA_VISITA).toLocalDate();
-                    System.out.println(codigoVisita + "\t" + idPaciente + "\t" + fechaVisitaPaciente + "\t" + enfermedaVisita + "\t" + importeVisita + "\t" + porcentajePagoVisita + "\t" + proximaVisita);
+                    System.out.println(codigoVisita + "\t" + " ID PACIENTE: " + idPaciente + "\t" + fechaVisitaPaciente + "\t" + enfermedaVisita + "\t" + importeVisita + "\t" + porcentajePagoVisita + "\t" + proximaVisita);
                 }
                 resultSet.close();
-                System.out.println("ALL APPOINTMENTS SUCCESSFULLY CHARGED!");
             }
+            System.out.println("ALL APPOINTMENTS SUCCESSFULLY CHARGED!");
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
+    }
+
+    //METODO PARA DEVOLVER POR CONSOLA LOS DATOS DE LA TABLA USUARIOS
+    public static void printTablaUsuarios(){
+        try{
+            ResultSet resultSet = selectAllFromUsuarios(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            if(resultSet != null){
+                while(resultSet.next()){
+                    int codigo = resultSet.getInt(DBT_USUARIOS_C_CODIGO);
+                    String nombre = resultSet.getString(DBT_USUARIOS_C_NOMBRE);
+                    String contrasenya = resultSet.getString(DBT_USUARIOS_C_CONTRASENYA);
+                    System.out.println( "ID_USUARIO: " + codigo + "\t" + nombre + "\t" + contrasenya);
+                }
+                resultSet.close();
+            }
+            System.out.println("ALL USERS SUCCESSFULLY CHARGED!");
+        } catch (SQLException e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+
     }
 }
