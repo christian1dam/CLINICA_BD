@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MAIN_INTERFACE_CLINICA extends JFrame {
-    private static final List<Usuario> usuarios = new ArrayList<>();
+    private static final List<Paciente> usuarios = new ArrayList<>();
     private JPanel CLINICA_MAIN_PANEL;
     private JLabel CLINICA_LABEL;
     private JPanel HEADER_PANEL;
@@ -33,12 +33,9 @@ public class MAIN_INTERFACE_CLINICA extends JFrame {
     private JTextField setTurno;
 
     public  MAIN_INTERFACE_CLINICA(){
-    }
 
-    public MAIN_INTERFACE_CLINICA(int idUsuario){
-        setPatient(idUsuario);
-    }
 
+    }
 
 
     public void setPatient(int IdUsuario){
@@ -52,7 +49,11 @@ public class MAIN_INTERFACE_CLINICA extends JFrame {
         setTurno.setText("Turno: " + currentPatient.getTurno());
     }
 
-    public JPanel getMainJPanel(){
-        return this.CLINICA_MAIN_PANEL;
+    public static void main(String[] args) {
+            JFrame pantallClinicaPrincipal = new JFrame("Clinica");
+            pantallClinicaPrincipal.setContentPane(new MAIN_INTERFACE_CLINICA().CLINICA_MAIN_PANEL);
+            pantallClinicaPrincipal.setVisible(true);
+            pantallClinicaPrincipal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            pantallClinicaPrincipal.pack();
     }
 }

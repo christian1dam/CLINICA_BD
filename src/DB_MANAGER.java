@@ -18,12 +18,6 @@ public class DB_MANAGER {
     //CONSTANTES PARA CHECK SI SE AH PODIDO CONECTAR CON LA BASE DE DATOS
     private static final String DB_MYSQL_CONNECTION_OK = "SUCCESSFULLY CONNECTED TO " + DBNAME + " DATABASE";
     private static final String DB_MYSQL_CONNECTION_NOT_OK = "ERROR! COULD NOT BEEN CONNECTED TO" + DBNAME + " DATABASE";
-    //CONSTANTES APRA LA TABLA USUARIOS
-    private static final String DBT_USUARIOS = "USUARIOS";
-    private static final String DBT_USUARIOS_C_CODIGO = "CODIGO";
-    private static final String DBT_USUARIOS_C_NOMBRE = "NOMBRE";
-    private static final String DBT_USUARIOS_C_CONTRASENYA = "CONTRASENYA";
-    private static final String BDT_USUARIOS_SELECT_ALL_QUERY = "SELECT * FROM " + DBT_USUARIOS;
     //CONSTANTES PARA LA TABLA PACIENTES
     private static final String DBT_PACIENTES = "pacientes";
     private static final String DBT_PACIENTES_C_CODIGO = "CODIGO";
@@ -92,22 +86,6 @@ public class DB_MANAGER {
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
-        }
-    }
-
-    //METODO PARA EJECUTAR LA QUERY SELECT * FROM USUARIOS Y DEVOLVER EL RESULTADO
-    public static ResultSet selectAllFromUsuarios(){
-        return selectAllFromUsuarios(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-    }
-
-    public static ResultSet selectAllFromUsuarios(int resultSetType, int resultSetConcurrency){
-        try{
-            Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
-            return statement.executeQuery(BDT_USUARIOS_SELECT_ALL_QUERY);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            return null;
         }
     }
 
@@ -194,52 +172,10 @@ public class DB_MANAGER {
         }
     }
 
-    //METODO PARA DEVOLVER POR CONSOLA LOS DATOS DE LA TABLA USUARIOS
-    public static void printTablaUsuarios(){
-        try{
-            ResultSet resultSet = selectAllFromUsuarios(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            if(resultSet != null){
-                while(resultSet.next()){
-                    int codigo = resultSet.getInt(DBT_USUARIOS_C_CODIGO);
-                    String nombre = resultSet.getString(DBT_USUARIOS_C_NOMBRE);
-                    String contrasenya = resultSet.getString(DBT_USUARIOS_C_CONTRASENYA);
-                    System.out.println( "ID_USUARIO: " + codigo + "\t" + nombre + "\t" + contrasenya);
-                }
-                resultSet.close();
-            }
-            System.out.println("ALL USERS SUCCESSFULLY CHARGED!");
-        } catch (SQLException e){
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public static ResultSet exisitUser(int resultSetType, int resultSetConcurrency, String nombre, String password) {
+    public static ResultSet getPatienByName(int resultSetType, int resultSetConcurrency, String name) {
         try {
             Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
-            return statement.executeQuery("select * from " + DBT_USUARIOS + " where " + DBT_USUARIOS_C_NOMBRE + " = '" + nombre + "' and " + DBT_USUARIOS_C_CONTRASENYA + " = '" + password + "';");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
-        return null;
-    }
-
-    public static ResultSet getUserID(int resultSetType, int resultSetConcurrency, String nombre, String password) {
-        try {
-            Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
-            return statement.executeQuery("select CODIGO from " + DBT_USUARIOS + " where " + DBT_USUARIOS_C_NOMBRE + " = '" + nombre + "' and " + DBT_USUARIOS_C_CONTRASENYA + " = '" + password + "';");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    public static ResultSet getPatienByID(int resultSetType, int resultSetConcurrency, int idUsuario) {
-        try {
-            Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
-            return statement.executeQuery("select * from " + DBT_PACIENTES + " where " + DBT_PACIENTES_C_ID_USUARIO + " = '" + idUsuario + "';");
+            return statement.executeQuery("select * from " + DBT_PACIENTES + " where " + DBT_PACIENTES_C_NOMBRE + " = '" + name + "';");
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
