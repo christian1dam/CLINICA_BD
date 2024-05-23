@@ -182,4 +182,14 @@ public class DB_MANAGER {
             return null;
         }
     }
+
+    public static void crearPaciente(Paciente paciente) {
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeQuery("INSERT INTO " + DBT_PACIENTES + "(NOMBRE, DIRECCION, CIUDAD, TELEFONO, DIABETICO, FECHA_NACIMIENTO, TURNO, ID_USUARIO) VALUES(" + "'" + paciente.getNombre() + "'" + "'" + paciente.getDireccion() + "'" + "'" + paciente.getCiudad() + "'" + "'" + paciente.getTelefono() + "'" + "null' " + "'" + paciente.getFechaNacimiento() + "'" + "'" + paciente.getTurno() + "'" + "'" + "null" + "'" + ");");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+    }
 }

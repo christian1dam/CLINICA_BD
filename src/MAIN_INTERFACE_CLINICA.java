@@ -1,21 +1,17 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MAIN_INTERFACE_CLINICA extends JFrame {
-    private static final List<Paciente> usuarios = new ArrayList<>();
+    private static List<Paciente> pacientes = new ArrayList<>();
     private JPanel CLINICA_MAIN_PANEL;
     private JLabel CLINICA_LABEL;
     private JPanel HEADER_PANEL;
     private JPanel MAIN_PANEL;
     private JPanel FOOTER_PANEL;
-    private JLabel nombrePacienteField;
-    private JLabel direccionPacienteField;
-    private JLabel ciudadPacietneField;
-    private JLabel telefonoPacienteField;
-    private JLabel diabeticoPacienteField;
-    private JLabel fechaNacPacienteField;
-    private JLabel turnoPacienteField;
     private JTable TablaPacientesJTABLE;
     private JButton editarMisDatosButton;
     private JButton verMisVisitasButton;
@@ -24,29 +20,36 @@ public class MAIN_INTERFACE_CLINICA extends JFrame {
     private JButton BorrarPacienteButton;
     private JButton VerOtrasVisitasButton;
     private JButton CrearVisitasButton;
-    private JTextField setNombre;
-    private JTextField setDireccion;
-    private JTextField setCiudad;
-    private JTextField setTelefono;
-    private JTextField setDiabetico;
-    private JTextField setFechaNac;
-    private JTextField setTurno;
 
     public  MAIN_INTERFACE_CLINICA(){
-
-
+        cargarTabla();
+        CrearPacienteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame crearPaciente = new JFrame("Crear Paciente");
+                crearPaciente.setContentPane(new CREAR_PACIENTE().getPanel());
+                crearPaciente.setVisible(true);
+                crearPaciente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                crearPaciente.pack();
+            }
+        });
     }
 
-
-    public void setPatient(int IdUsuario){
-        Paciente currentPatient = DATA_MANAGER.getPatientByID(IdUsuario);
-        assert currentPatient != null;
-        setNombre.setText("Nombre: " + currentPatient.getNombre());
-        setDireccion.setText("Dirección: " + currentPatient.getDireccion());
-        setCiudad.setText("Ciudad: " + currentPatient.getCiudad());
-        setTelefono.setText("Teléfono: " + currentPatient.getTelefono());
-        setFechaNac.setText("Fecha de nacimiento: " + currentPatient.getFechaNacimiento());
-        setTurno.setText("Turno: " + currentPatient.getTurno());
+    private void cargarTabla(){
+        String[] columnNames = {"CODIGO", "NOMBRE", "DIRECCION", "CIUDAD", "TELEFONO", "DIABETICO", "FECHA_NACIMIENTO", "TURNO"};
+        pacientes = DATA_MANAGER.getPacientes();
+        String[][] data = new String[pacientes.size()][columnNames.length];
+        for (int i = 0; i < data.length; i++) {
+            data[i][0] = String.valueOf(pacientes.get(i).getCodigo());
+            data[i][1] = String.valueOf(pacientes.get(i).getNombre());
+            data[i][2] = String.valueOf(pacientes.get(i).getDireccion());
+            data[i][3] = String.valueOf(pacientes.get(i).getCiudad());
+            data[i][4] = String.valueOf(pacientes.get(i).getTelefono());
+            data[i][5] = String.valueOf(pacientes.get(i).getDiabetico());
+            data[i][6] = String.valueOf(pacientes.get(i).getFechaNacimiento());
+            data[i][7] = String.valueOf(pacientes.get(i).getTurno());
+        }
+        TablaPacientesJTABLE.setModel(new DefaultTableModel(data, columnNames));
     }
 
     public static void main(String[] args) {
