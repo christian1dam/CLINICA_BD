@@ -9,8 +9,15 @@ public class Paciente {
     private int diabetico;
     private LocalDate fechaNacimiento;
     private int turno;
+    private int IDUsuario;
+
+    public int getIDUsuario() {
+        return IDUsuario;
+    }
+
     //TODO -> IMPLEMENTAR VALIDACIONES
-    public Paciente(String nombre, String direccion, String ciudad, String telefono, int diabetico, LocalDate fechaNacimiento, int turno) {
+    public Paciente(int codigo, String nombre, String direccion, String ciudad, String telefono, int diabetico, LocalDate fechaNacimiento, int turno, int IDUsuario) {
+        this.codigo = codigo;
         setNombre(nombre);
         setDireccion(direccion);
         setCiudad(ciudad);
@@ -18,6 +25,7 @@ public class Paciente {
         setDiabetico(diabetico);
         setFechaNacimiento(fechaNacimiento);
         setTurno(turno);
+        this.IDUsuario = IDUsuario;
     }
 
     public int getCodigo() {

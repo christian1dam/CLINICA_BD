@@ -1,4 +1,3 @@
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.time.LocalDate;
 
@@ -213,6 +212,38 @@ public class DB_MANAGER {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
+    }
 
+    public static ResultSet exisitUser(int resultSetType, int resultSetConcurrency, String nombre, String password) {
+        try {
+            Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
+            return statement.executeQuery("select * from " + DBT_USUARIOS + " where " + DBT_USUARIOS_C_NOMBRE + " = '" + nombre + "' and " + DBT_USUARIOS_C_CONTRASENYA + " = '" + password + "';");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    public static ResultSet getUserID(int resultSetType, int resultSetConcurrency, String nombre, String password) {
+        try {
+            Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
+            return statement.executeQuery("select CODIGO from " + DBT_USUARIOS + " where " + DBT_USUARIOS_C_NOMBRE + " = '" + nombre + "' and " + DBT_USUARIOS_C_CONTRASENYA + " = '" + password + "';");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    public static ResultSet getPatienByID(int resultSetType, int resultSetConcurrency, int idUsuario) {
+        try {
+            Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
+            return statement.executeQuery("select * from " + DBT_PACIENTES + " where " + DBT_PACIENTES_C_ID_USUARIO + " = '" + idUsuario + "';");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 }

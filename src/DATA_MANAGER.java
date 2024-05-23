@@ -27,5 +27,49 @@ public class DATA_MANAGER {
     }
 
 
+    public static boolean existsUser(String nombre, String password) {
+        if(DB_MANAGER.openConnectionToDatabase()){
+            ResultSet rs = DB_MANAGER.exisitUser(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, nombre, password);
+            try {
+                if(rs != null && rs.next() && rs.getString("nombre").equals(nombre) && rs.getString("contrasenya").equals(password)){
+                    return true;
+                } else return false;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return false;
+    }
+
+    public static Paciente getPatientByID(int idUsuario) {
+        if(DB_MANAGER.openConnectionToDatabase()){
+            ResultSet rs = DB_MANAGER.getPatienByID(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, idUsuario);
+            try {
+                if(rs != null && rs.next()){
+                    return new Paciente(rs.getInt("CODIGO"), rs.getString("NOMBRE"), rs.getString("DIRECCION"), rs.getString("CIUDAD"), rs.getString("TELEFONO"), rs.getInt("DIABETICO"), rs.getDate("FECHA_NACIMIENTO").toLocalDate(), rs.getInt("TURNO"), rs.getInt("ID_USUARIO"));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
+    }
+
+    public static Integer getUserID(String nombre, String password) {
+        if(DB_MANAGER.openConnectionToDatabase()){
+            ResultSet rs = DB_MANAGER.getUserID(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, nombre, password);
+            try {
+                if (rs != null && rs.next()){
+                    return rs.getInt("CODIGO");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println(e.getMessage());
+                return null;
+            }
+        }
+        //conexion no establecida
+        return -1;
+    }
 }
 
